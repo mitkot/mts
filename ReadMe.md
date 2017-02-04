@@ -7,6 +7,7 @@ mts is a test suite that Mitsuhiro Kotake (mitkot) developed and maintained.
 <pre>
 mts help
 Usage: mts mysql test
+       mts psql test
          
 </pre>
 
