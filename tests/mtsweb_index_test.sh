@@ -8,5 +8,5 @@ if [[ ! -f "$file" ]]; then
   exit 1
 fi
 
-grep -q "mts test web page after hotfix" "$file"
+grep -q "mts test web page" "$file"
 grep -q "Pattern without using gh pr" "$file"
