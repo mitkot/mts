@@ -1,0 +1,18 @@
+name: tests-sh
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run shell tests
+        run: |
+          set -e
+          for f in tests/*.sh; do
+            bash "$f"
+          done
