@@ -1,0 +1,55 @@
+name: auto-delete-merged-branch
+
+on:
+  pull_request:
+    types:
+      - closed
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  delete-branch:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete merged branch
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const pr = context.payload.pull_request
+            if (!pr) {
+              core.info('No pull_request payload. Skipping.')
+              return
+            }
+
+            const owner = context.repo.owner
+            const repo = context.repo.repo
+            const defaultBranch = context.payload.repository?.default_branch
+            const branch = pr.head?.ref
+            const headRepoFullName = pr.head?.repo?.full_name
+            const thisRepoFullName = `${owner}/${repo}`
+
+            if (!branch) {
+              core.info('No head ref. Skipping.')
+              return
+            }
+
+            if (headRepoFullName !== thisRepoFullName) {
+              core.info(`PR from fork (${headRepoFullName}). Skipping delete.`)
+              return
+            }
+
+            if (defaultBranch && branch === defaultBranch) {
+              core.info(`Branch is default (${defaultBranch}). Skipping delete.`)
+              return
+            }
+
+            await github.rest.git.deleteRef({
+              owner,
+              repo,
+              ref: `heads/${branch}`,
+            })
+
+            core.info(`Deleted branch: ${branch}`)
