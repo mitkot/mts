@@ -95,7 +95,9 @@ warn('ℹ️ Open {tiltfile_path} in your favorite editor to get started.'.forma
 
 local_resource(
     'mtsweb',
-    serve_cmd='uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload',
+    serve_cmd='uvicorn app.main:app --host {host} --port 8000 --reload'.format(
+        host=os.getenv('MTSWEB_UVICORN_HOST', '127.0.0.1'),
+    ),
     deps=['app/main.py', 'templates/index.html', '.env'],
 )
 
