@@ -1,4 +1,4 @@
-name: tests-sh
+name: pytest
 
 on:
   pull_request:
@@ -10,9 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run shell tests
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
         run: |
-          set -e
-          for f in tests/*.sh; do
-            bash "$f"
-          done
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run pytest
+        run: pytest -q

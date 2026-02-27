@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from authlib.integrations.starlette_client import OAuth
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
@@ -32,7 +32,7 @@ def get_db():
 @router.get("/login")
 async def google_login(request: Request):
     if not settings.google_client_id or not settings.google_client_secret:
-        raise HTTPException(status_code=500, detail="Google OAuth is not configured")
+        return RedirectResponse(url="/?auth_error=google_oauth_not_configured", status_code=303)
 
     redirect_uri = f"{settings.app_base_url}/auth/google/callback"
     return await oauth.google.authorize_redirect(request, redirect_uri)

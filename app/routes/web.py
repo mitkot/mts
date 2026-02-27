@@ -11,7 +11,10 @@ async def home(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"user": request.session.get("user")},
+        context={
+            "user": request.session.get("user"),
+            "auth_error": request.query_params.get("auth_error"),
+        },
     )
 
 
