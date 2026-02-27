@@ -3,31 +3,331 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MTS Google Login</title>
+  <title>mts web</title>
   <style>
-    body { font-family: sans-serif; max-width: 720px; margin: 2rem auto; line-height: 1.6; }
-    .card { border: 1px solid #ddd; border-radius: 12px; padding: 1.25rem; }
-    button { padding: 0.6rem 1rem; border-radius: 8px; border: 0; background: #1a73e8; color: #fff; cursor: pointer; }
-    img { border-radius: 999px; }
+    :root {
+      --bg: #f3efe7;
+      --panel: rgba(255, 255, 255, 0.8);
+      --text: #151515;
+      --muted: #5f5a53;
+      --line: rgba(21, 21, 21, 0.12);
+      --shadow: 0 24px 80px rgba(33, 26, 16, 0.16);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(217, 168, 117, 0.22), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(109, 142, 255, 0.15), transparent 28%),
+        var(--bg);
+    }
+
+    .shell {
+      width: min(100%, 960px);
+      margin: 0 auto;
+      padding: 72px 24px 96px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .eyebrow {
+      margin: 0;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(3rem, 10vw, 5.5rem);
+      line-height: 0.96;
+      letter-spacing: -0.06em;
+      font-weight: 700;
+    }
+
+    .lead {
+      width: min(100%, 36rem);
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .primary-button,
+    .secondary-button,
+    .oauth-button,
+    .close-button {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .primary-button,
+    .secondary-button {
+      padding: 14px 22px;
+      border-radius: 999px;
+    }
+
+    .primary-button {
+      background: #111111;
+      color: #ffffff;
+    }
+
+    .secondary-button {
+      background: rgba(255, 255, 255, 0.55);
+      color: var(--text);
+      border: 1px solid var(--line);
+      text-decoration: none;
+    }
+
+    .status-card {
+      margin-top: 28px;
+      padding: 24px;
+      border-radius: 28px;
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .status-card p {
+      margin: 0 0 8px;
+    }
+
+    .status-card img {
+      border-radius: 999px;
+      display: block;
+      margin-top: 16px;
+    }
+
+    .error-banner {
+      margin-top: 24px;
+      padding: 14px 18px;
+      border-radius: 18px;
+      background: rgba(188, 58, 58, 0.08);
+      border: 1px solid rgba(188, 58, 58, 0.18);
+      color: #8a2a2a;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(17, 17, 17, 0.44);
+      z-index: 20;
+    }
+
+    .modal.is-open {
+      display: flex;
+    }
+
+    .modal-panel {
+      width: min(100%, 420px);
+      padding: 28px 24px 24px;
+      border-radius: 32px;
+      background: #f7f5f2;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+      position: relative;
+    }
+
+    .modal-panel h2 {
+      margin: 10px 0 12px;
+      font-size: clamp(2rem, 7vw, 2.6rem);
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+      text-align: center;
+    }
+
+    .modal-panel p {
+      margin: 0 auto 24px;
+      max-width: 18rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text);
+      font-size: 1.4rem;
+    }
+
+    .oauth-button {
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px 20px;
+      border-radius: 999px;
+      border: 1px solid rgba(17, 17, 17, 0.14);
+      background: #ffffff;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .oauth-button:focus-visible,
+    .primary-button:focus-visible,
+    .secondary-button:focus-visible,
+    .close-button:focus-visible {
+      outline: 2px solid #111111;
+      outline-offset: 2px;
+    }
+
+    .google-mark {
+      width: 18px;
+      height: 18px;
+      display: inline-block;
+    }
+
+    .helper-text {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        padding-top: 48px;
+      }
+
+      .modal-panel {
+        border-radius: 28px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Googleログイン最小実装</h1>
-  <div class="card">
-    {% if user %}
-      <p><strong>ログイン済み</strong></p>
-      <p>名前: {{ user.name }}</p>
-      <p>メール: {{ user.email }}</p>
-      {% if user.avatar_url %}
-      <p><img src="{{ user.avatar_url }}" alt="avatar" width="48" height="48"></p>
+  <main class="shell">
+    <section class="hero">
+      <p class="eyebrow">Welcome</p>
+      <h1>mts web</h1>
+      <p class="lead">
+        Google OAuth2.0 の接続状態に関係なく、最初の画面はここまで表示します。
+        ログイン操作はモーダル内の Continue with Google から開始できます。
+      </p>
+      <div class="actions">
+        {% if user %}
+        <form method="post" action="/auth/google/logout">
+          <button class="primary-button" type="submit">Log out</button>
+        </form>
+        {% else %}
+        <button class="primary-button" type="button" data-open-modal>Login</button>
+        {% endif %}
+      </div>
+      {% if auth_error %}
+      <div class="error-banner">
+        Google OAuth2.0 はまだ完了していません。設定を確認してから再度お試しください。
+      </div>
       {% endif %}
-      <form method="post" action="/auth/google/logout">
-        <button type="submit">ログアウト</button>
-      </form>
-    {% else %}
-      <p>未ログインです。</p>
-      <a href="/auth/google/login"><button type="button">Googleでログイン</button></a>
-    {% endif %}
+      {% if user %}
+      <section class="status-card">
+        <p><strong>ログイン済み</strong></p>
+        <p>名前: {{ user.name }}</p>
+        <p>メール: {{ user.email }}</p>
+        {% if user.avatar_url %}
+        <img src="{{ user.avatar_url }}" alt="avatar" width="56" height="56">
+        {% endif %}
+      </section>
+      {% endif %}
+    </section>
+  </main>
+
+  <div class="modal" id="login-modal" aria-hidden="true">
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+      <button class="close-button" type="button" aria-label="Close" data-close-modal>&times;</button>
+      <h2 id="login-modal-title">Log in or sign up</h2>
+      <p>You&apos;ll get smarter responses and can upload files, images, and more.</p>
+      <a class="oauth-button" href="/auth/google/login">
+        <svg class="google-mark" viewBox="0 0 18 18" aria-hidden="true">
+          <path fill="#EA4335" d="M9 7.363v3.49h4.85c-.212 1.12-.85 2.068-1.807 2.705l2.921 2.267C16.668 14.25 17.5 11.93 17.5 9c0-.554-.05-1.087-.143-1.637H9z"/>
+          <path fill="#4285F4" d="M9 18c2.43 0 4.468-.805 5.957-2.175l-2.92-2.267c-.807.542-1.84.862-3.037.862-2.336 0-4.316-1.578-5.022-3.7H.96v2.325A8.999 8.999 0 0 0 9 18z"/>
+          <path fill="#FBBC05" d="M3.978 10.72A5.407 5.407 0 0 1 3.697 9c0-.596.102-1.175.281-1.72V4.955H.96A8.999 8.999 0 0 0 .5 9c0 1.45.348 2.823.96 4.045l2.518-1.956z"/>
+          <path fill="#34A853" d="M9 3.58c1.322 0 2.51.455 3.443 1.35l2.582-2.582C13.463.895 11.427 0 9 0A8.999 8.999 0 0 0 .96 4.955L3.978 7.28C4.684 5.157 6.664 3.58 9 3.58z"/>
+        </svg>
+        Continue with Google
+      </a>
+      <div class="helper-text">Click outside this dialog to go back.</div>
+    </div>
   </div>
+
+  <script>
+    const modal = document.getElementById("login-modal");
+    const openButton = document.querySelector("[data-open-modal]");
+    const closeButton = document.querySelector("[data-close-modal]");
+
+    function openModal() {
+      if (!modal) {
+        return;
+      }
+      modal.classList.add("is-open");
+      modal.setAttribute("aria-hidden", "false");
+      if (closeButton) {
+        closeButton.focus();
+      }
+    }
+
+    function closeModal() {
+      if (!modal) {
+        return;
+      }
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      if (openButton) {
+        openButton.focus();
+      }
+    }
+
+    if (openButton) {
+      openButton.addEventListener("click", openModal);
+    }
+
+    if (closeButton) {
+      closeButton.addEventListener("click", closeModal);
+    }
+
+    if (modal) {
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+          closeModal();
+        }
+      });
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && modal && modal.classList.contains("is-open")) {
+        closeModal();
+      }
+    });
+  </script>
 </body>
 </html>

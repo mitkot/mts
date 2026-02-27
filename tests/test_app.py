@@ -15,7 +15,8 @@ def test_home_page_contains_google_login_button():
     response = client.get("/")
 
     assert response.status_code == 200
-    assert "Googleでログイン" in response.text
+    assert "mts web" in response.text
+    assert "Continue with Google" in response.text
 
 
 def test_me_endpoint_returns_guest_when_not_logged_in():
